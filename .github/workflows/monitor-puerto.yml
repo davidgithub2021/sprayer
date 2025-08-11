@@ -1,0 +1,21 @@
+name: Monitoreo de Puerto
+
+on:
+  schedule:
+    - cron: "*/1 * * * *" # Cada 10 minutos
+  workflow_dispatch: # Permite ejecutarlo manualmente
+
+jobs:
+  check-port:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verificar puerto con nc
+        run: |
+          HOST="www.grupoinnover.com"
+          PORT=443
+          if nc -zv $HOST $PORT; then
+            echo "Puerto $PORT en $HOST está ABIERTO ✅"
+          else
+            echo "Puerto $PORT en $HOST está CERRADO ❌"
+            exit 1
+          fi
