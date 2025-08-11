@@ -2,20 +2,39 @@ name: Monitoreo de Puerto
 
 on:
   schedule:
-    - cron: "*/1 * * * *" # Cada 10 minutos
-  workflow_dispatch: # Permite ejecutarlo manualmente
+    - cron: "*/10 * * * *"  # cada 10 minutos
+  workflow_dispatch:
 
 jobs:
   check-port:
     runs-on: ubuntu-latest
     steps:
       - name: Verificar puerto con nc
+        id: checkport
         run: |
           HOST="www.grupoinnover.com"
           PORT=443
           if nc -zv $HOST $PORT; then
+            echo "status=abierto" >> $GITHUB_OUTPUT
             echo "Puerto $PORT en $HOST está ABIERTO ✅"
           else
+            echo "status=cerrado" >> $GITHUB_OUTPUT
             echo "Puerto $PORT en $HOST está CERRADO ❌"
             exit 1
           fi
+
+      - name: Enviar reporte POST si puerto está cerrado
+        if: steps.checkport.outputs.status == 'cerrado'
+        run: |
+          curl -X POST "https://api.tuservidor.com/reporte?puerto=443&host=example.com" \
+            -H "Authorization: Bearer tu_token_aqui" \
+            -H "Content-Type: application/json" \
+            -d '{"mensaje":"Puerto cerrado detectado en monitor"}'
+
+      - name: Enviar reporte POST si puerto está abierto
+        if: steps.checkport.outputs.status == 'abierto'
+        run: |
+          curl -X POST "https://www.grupoinnover.com/reporte?puerto=443&host=example.com" \
+            -H "Authorization: Bearer tu_token_aqui" \
+            -H "Content-Type: application/json" \
+            -d '{"mensaje":"Puerto abierto y funcionando correctamente"}'
